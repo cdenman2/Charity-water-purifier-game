@@ -1,117 +1,285 @@
-const container = document.getElementById("dropsContainer")
+const dropsContainer = document.getElementById("dropsContainer");
+const scoreDisplay = document.getElementById("scoreDisplay");
+const levelDisplay = document.getElementById("levelDisplay");
+const dirtyTankDisplay = document.getElementById("dirtyTankDisplay");
+const livesDisplay = document.getElementById("livesDisplay");
+const reservoirFill = document.getElementById("reservoirFill");
+const reservoirFillText = document.getElementById("reservoirFillText");
+const leftDrinkFill = document.getElementById("leftDrinkFill");
+const rightDrinkFill = document.getElementById("rightDrinkFill");
+const messageBox = document.getElementById("messageBox");
+const gameOverPanel = document.getElementById("gameOverPanel");
+const finalLives = document.getElementById("finalLives");
+const finalDirty = document.getElementById("finalDirty");
+const finalScore = document.getElementById("finalScore");
 
-let score = 0
-let level = 1
-let lives = 4
-let dirty = 0
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const resetBtn = document.getElementById("resetBtn");
+const desktopStartBtn = document.getElementById("desktopStartBtn");
+const desktopPauseBtn = document.getElementById("desktopPauseBtn");
+const desktopResetBtn = document.getElementById("desktopResetBtn");
+const playAgainBtn = document.getElementById("playAgainBtn");
 
-let running = false
+const gameArea = document.getElementById("gameArea");
 
-function updateDisplays(){
+const MAX_DIRTY_IN_TANK = 4;
+const STARTING_LIVES = 4;
+const DIRTY_CLICK_POINTS = 100;
+const DIRTY_HIT_PENALTY = 200;
+const TANK_FULL_BONUS = 1000;
 
-document.getElementById("scoreDisplay").textContent = score
-document.getElementById("levelDisplay").textContent = level
-document.getElementById("dirtyTankDisplay").textContent = dirty + " / 4"
+let score = 0;
+let level = 1;
+let lives = STARTING_LIVES;
+let dirtyInTank = 0;
+let reservoirCurrent = 0;
+let drinkTankProgress = 0;
 
+let running = false;
+let gameOver = false;
+let spawnIntervalId = null;
+let animationFrameId = null;
+let messageTimeoutId = null;
+
+let drops = [];
+
+function getLevelGoal() {
+  return 12 + (level - 1) * 4;
 }
 
-function createDrop(){
-
-if(!running)return
-
-let drop = document.createElement("div")
-
-let polluted = Math.random() < .3
-
-drop.className = polluted ? "drop polluted-drop" : "drop clean-drop"
-
-let shape = document.createElement("div")
-shape.className="drop-shape"
-
-drop.appendChild(shape)
-
-let lane = document.getElementById("gameArea").clientWidth * .5
-let left = (document.getElementById("gameArea").clientWidth - lane)/2
-
-drop.style.left = left + Math.random()*lane + "px"
-drop.style.top = "120px"
-
-container.appendChild(drop)
-
-let y = 120
-
-function fall(){
-
-if(!running)return
-
-y += 1 + level*.3
-
-drop.style.top = y + "px"
-
-if(y > 580){
-
-drop.remove()
-
-if(polluted){
-
-dirty++
-score -= 200
-lives--
-
-document.getElementById("messageBox").textContent="Let's do better on our clean up"
-
-if(dirty>=4 || lives<=0){
-
-alert("GAME OVER")
-running=false
-
+function getSpawnRate() {
+  return Math.max(520, 1500 - (level - 1) * 110);
 }
 
-}else{
-
-score += 10
-
+function getDropSpeed() {
+  return 0.75 + (level - 1) * 0.16;
 }
 
-updateDisplays()
+function updateDisplays() {
+  scoreDisplay.textContent = score;
+  levelDisplay.textContent = level;
+  dirtyTankDisplay.textContent = `${dirtyInTank} / ${MAX_DIRTY_IN_TANK}`;
+  reservoirFillText.textContent = `Reservoir Fill: ${reservoirCurrent} / ${getLevelGoal()}`;
 
-return
+  const fillPercent = Math.min((reservoirCurrent / getLevelGoal()) * 100, 100);
+  reservoirFill.style.height = `${fillPercent}%`;
 
+  const drinkPercent = Math.min((drinkTankProgress / 8) * 100, 100);
+  leftDrinkFill.style.height = `${drinkPercent}%`;
+  rightDrinkFill.style.height = `${drinkPercent}%`;
+
+  renderLives();
 }
 
-requestAnimationFrame(fall)
+function renderLives() {
+  livesDisplay.innerHTML = "";
 
+  for (let i = 0; i < STARTING_LIVES; i++) {
+    const glass = document.createElement("div");
+    glass.className = i < lives ? "glass" : "glass empty";
+    livesDisplay.appendChild(glass);
+  }
 }
 
-if(polluted){
+function showMessage(text, type = "") {
+  messageBox.textContent = text;
+  messageBox.className = "message-box";
 
-drop.onclick=()=>{
+  if (type === "success") {
+    messageBox.classList.add("success");
+  } else if (type === "warning") {
+    messageBox.classList.add("warning");
+  }
 
-drop.remove()
-
-score+=100
-
-document.getElementById("messageBox").textContent="Awesome Job, purifying water one drop at a time"
-
-updateDisplays()
-
+  clearTimeout(messageTimeoutId);
+  messageTimeoutId = setTimeout(() => {
+    messageBox.textContent = "Protect the reservoir and keep polluted water out.";
+    messageBox.className = "message-box";
+  }, 1800);
 }
 
+function createDrop() {
+  if (!running || gameOver) return;
+
+  const drop = document.createElement("div");
+  const polluted = Math.random() < 0.3;
+
+  drop.className = polluted ? "drop polluted-drop clickable" : "drop clean-drop";
+
+  const shape = document.createElement("div");
+  shape.className = "drop-shape";
+  drop.appendChild(shape);
+
+  const gameWidth = gameArea.clientWidth;
+  const laneWidth = gameWidth * 0.5;
+  const laneLeft = (gameWidth - laneWidth) / 2;
+  const startX = laneLeft + Math.random() * (laneWidth - 42);
+
+  drop.style.left = `${startX}px`;
+  drop.style.top = "190px";
+
+  dropsContainer.appendChild(drop);
+
+  const dropData = {
+    element: drop,
+    polluted: polluted,
+    x: startX,
+    y: 190,
+    speed: getDropSpeed()
+  };
+
+  if (polluted) {
+    drop.addEventListener("click", () => {
+      if (!drops.includes(dropData)) return;
+      drop.remove();
+      drops = drops.filter(d => d !== dropData);
+      score += DIRTY_CLICK_POINTS;
+      updateDisplays();
+      showMessage("Awesome Job, purifying water one drop at a time.", "success");
+    });
+  }
+
+  drops.push(dropData);
 }
 
-fall()
+function handleDropReachedReservoir(dropData) {
+  dropData.element.remove();
+  drops = drops.filter(d => d !== dropData);
 
+  if (dropData.polluted) {
+    dirtyInTank += 1;
+    lives -= 1;
+    score -= DIRTY_HIT_PENALTY;
+
+    if (score < 0) score = 0;
+    if (lives < 0) lives = 0;
+
+    updateDisplays();
+    showMessage("Let's do better on our clean up.", "warning");
+
+    if (dirtyInTank >= MAX_DIRTY_IN_TANK || lives <= 0) {
+      endGame();
+    }
+  } else {
+    reservoirCurrent += 1;
+    updateDisplays();
+
+    if (reservoirCurrent >= getLevelGoal()) {
+      completeLevel();
+    }
+  }
 }
 
-function startGame(){
+function animateDrops() {
+  if (!running || gameOver) return;
 
-running=true
-setInterval(createDrop,1500)
+  const reservoirTop = gameArea.clientHeight - 190;
 
+  for (let i = drops.length - 1; i >= 0; i--) {
+    const drop = drops[i];
+    drop.y += drop.speed;
+    drop.element.style.top = `${drop.y}px`;
+
+    if (drop.y >= reservoirTop) {
+      handleDropReachedReservoir(drop);
+    }
+  }
+
+  animationFrameId = requestAnimationFrame(animateDrops);
 }
 
-document.getElementById("startBtn").onclick=startGame
-document.getElementById("pauseBtn").onclick=()=>running=false
-document.getElementById("resetBtn").onclick=()=>location.reload()
+function completeLevel() {
+  running = false;
+  clearInterval(spawnIntervalId);
+  cancelAnimationFrame(animationFrameId);
 
-updateDisplays()
+  drinkTankProgress += 1;
+
+  if (drinkTankProgress >= 8) {
+    drinkTankProgress = 0;
+    score += TANK_FULL_BONUS;
+    showMessage("Drinkable water tanks are full! Bonus +1000 points!", "success");
+  } else {
+    showMessage(`Level ${level} cleared!`, "success");
+  }
+
+  reservoirCurrent = 0;
+  dirtyInTank = 0;
+  level += 1;
+
+  updateDisplays();
+
+  setTimeout(() => {
+    running = true;
+    spawnIntervalId = setInterval(createDrop, getSpawnRate());
+    animateDrops();
+  }, 1300);
+}
+
+function startGame() {
+  if (running || gameOver) return;
+  running = true;
+  showMessage("Game started. Catch the polluted drops before they enter the reservoir.");
+  spawnIntervalId = setInterval(createDrop, getSpawnRate());
+  animateDrops();
+}
+
+function pauseGame() {
+  running = false;
+  clearInterval(spawnIntervalId);
+  cancelAnimationFrame(animationFrameId);
+  showMessage("Game paused.");
+}
+
+function resetGame() {
+  running = false;
+  gameOver = false;
+  clearInterval(spawnIntervalId);
+  cancelAnimationFrame(animationFrameId);
+
+  drops.forEach(drop => drop.element.remove());
+  drops = [];
+
+  score = 0;
+  level = 1;
+  lives = STARTING_LIVES;
+  dirtyInTank = 0;
+  reservoirCurrent = 0;
+  drinkTankProgress = 0;
+
+  gameOverPanel.classList.add("hidden");
+  updateDisplays();
+  showMessage("Game reset. Ready to protect clean water.");
+}
+
+function endGame() {
+  running = false;
+  gameOver = true;
+  clearInterval(spawnIntervalId);
+  cancelAnimationFrame(animationFrameId);
+
+  finalLives.textContent = lives;
+  finalDirty.textContent = dirtyInTank;
+  finalScore.textContent = score;
+  gameOverPanel.classList.remove("hidden");
+}
+
+function attachButton(button, handler) {
+  if (!button) return;
+  button.addEventListener("click", handler);
+  button.addEventListener("touchend", (event) => {
+    event.preventDefault();
+    handler();
+  }, { passive: false });
+}
+
+attachButton(startBtn, startGame);
+attachButton(pauseBtn, pauseGame);
+attachButton(resetBtn, resetGame);
+attachButton(desktopStartBtn, startGame);
+attachButton(desktopPauseBtn, pauseGame);
+attachButton(desktopResetBtn, resetGame);
+attachButton(playAgainBtn, resetGame);
+
+updateDisplays();
