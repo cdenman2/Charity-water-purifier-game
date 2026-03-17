@@ -48,6 +48,7 @@ let spawnIntervalId = null;
 let messageTimeoutId = null;
 
 let drops = [];
+let audioContext = null;
 
 function getLevelGoal() {
   return 12 + (level - 1) * 4;
@@ -86,7 +87,43 @@ function getLaneWidth() {
 }
 
 function getDropStartY() {
-  return window.innerWidth <= 560 ? 165 : 170;
+  return window.innerWidth <= 560 ? 205 : 170;
+}
+
+function ensureAudioContext() {
+  if (!audioContext) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtx) {
+      audioContext = new AudioCtx();
+    }
+  }
+
+  if (audioContext && audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+}
+
+function playPopSound() {
+  ensureAudioContext();
+  if (!audioContext) return;
+
+  const now = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+
+  oscillator.type = "triangle";
+  oscillator.frequency.setValueAtTime(520, now);
+  oscillator.frequency.exponentialRampToValueAtTime(180, now + 0.12);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+
+  oscillator.start(now);
+  oscillator.stop(now + 0.15);
 }
 
 function updateDisplays() {
@@ -133,6 +170,7 @@ function showMessage(text, type = "") {
 }
 
 function startGame() {
+  ensureAudioContext();
   if (gameOver || levelTransition || running) return;
   running = true;
   showMessage("Game started. Catch the polluted drops before they enter the reservoir.");
@@ -149,6 +187,8 @@ function pauseGame() {
 }
 
 function resetGame() {
+  ensureAudioContext();
+
   running = false;
   gameOver = false;
   levelTransition = false;
@@ -245,6 +285,8 @@ function clickPollutedDrop(id) {
 
   const drop = drops[index];
   if (!drop.polluted) return;
+
+  playPopSound();
 
   drop.element.remove();
   drops.splice(index, 1);
@@ -401,7 +443,17 @@ function makeConfetti() {
 }
 
 function attachButton(btn, handler) {
-  if (btn) btn.addEventListener("click", handler);
+  if (btn) {
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      ensureAudioContext();
+      handler();
+    });
+
+    btn.addEventListener("touchstart", () => {
+      ensureAudioContext();
+    }, { passive: true });
+  }
 }
 
 attachButton(startBtn, startGame);
