@@ -19,9 +19,12 @@ const playAgainBtn = document.getElementById("playAgainBtn");
 
 const gameArea = document.getElementById("gameArea");
 
+const MAX_DIRTY_IN_TANK = 4;
+const STARTING_LIVES = 4;
+
 let score = 0;
 let level = 1;
-let lives = 5;
+let lives = STARTING_LIVES;
 let dirtyInTank = 0;
 let reservoirCurrent = 0;
 
@@ -41,21 +44,47 @@ function getLevelGoal() {
 }
 
 function getSpawnRate() {
-  return Math.max(400, 1050 - (level - 1) * 85);
+  return Math.max(420, 1200 - (level - 1) * 90);
 }
 
 function getDropSpeed() {
-  return 1.8 + (level - 1) * 0.35;
+  return 1.1 + (level - 1) * 0.22;
 }
 
 function getPollutedChance() {
-  return Math.min(0.65, 0.25 + (level - 1) * 0.06);
+  return Math.min(0.62, 0.22 + (level - 1) * 0.05);
+}
+
+function getLaneWidthPercent() {
+  if (window.innerWidth <= 560) {
+    return 0.66;
+  }
+  if (window.innerWidth <= 800) {
+    return 0.58;
+  }
+  if (window.innerWidth <= 1100) {
+    return 0.62;
+  }
+  return 0.54;
+}
+
+function getReservoirHeight() {
+  return window.innerWidth <= 560 ? 110 : 120;
+}
+
+function getLaneLeft() {
+  const laneWidth = gameArea.clientWidth * getLaneWidthPercent();
+  return (gameArea.clientWidth - laneWidth) / 2;
+}
+
+function getLaneWidth() {
+  return gameArea.clientWidth * getLaneWidthPercent();
 }
 
 function updateDisplays() {
   scoreDisplay.textContent = score;
   levelDisplay.textContent = level;
-  dirtyTankDisplay.textContent = `${dirtyInTank} / 3`;
+  dirtyTankDisplay.textContent = `${dirtyInTank} / ${MAX_DIRTY_IN_TANK}`;
   reservoirFillText.textContent = `Reservoir Fill: ${reservoirCurrent} / ${getLevelGoal()}`;
 
   const fillPercent = Math.min((reservoirCurrent / getLevelGoal()) * 100, 100);
@@ -67,7 +96,7 @@ function updateDisplays() {
 function renderLives() {
   livesDisplay.innerHTML = "";
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < STARTING_LIVES; i++) {
     const glass = document.createElement("div");
     glass.className = i < lives ? "glass" : "glass empty";
     livesDisplay.appendChild(glass);
@@ -92,12 +121,10 @@ function showMessage(text, type = "") {
 }
 
 function startGame() {
-  if (gameOver || levelTransition) return;
-  if (running) return;
+  if (gameOver || levelTransition || running) return;
 
   running = true;
   showMessage("Game started. Catch the polluted drops before they enter the reservoir.");
-
   beginSpawning();
   animateDrops();
 }
@@ -123,7 +150,7 @@ function resetGame() {
   drops = [];
   score = 0;
   level = 1;
-  lives = 5;
+  lives = STARTING_LIVES;
   dirtyInTank = 0;
   reservoirCurrent = 0;
 
@@ -152,6 +179,7 @@ function endGame() {
 
 function beginSpawning() {
   clearInterval(spawnIntervalId);
+
   spawnIntervalId = setInterval(() => {
     if (!running || gameOver || levelTransition) return;
     createDrop();
@@ -169,12 +197,12 @@ function createDrop() {
   shape.className = "drop-shape";
   drop.appendChild(shape);
 
-  const areaWidth = gameArea.clientWidth;
-  const startX = Math.random() * (areaWidth - 80) + 20;
-  const speed = getDropSpeed() + (Math.random() * 0.7 - 0.2);
-  const drift = Math.random() * 0.8 - 0.4;
-  const wobble = Math.random() * 1.7 + 0.6;
-  const size = isPolluted ? 42 : 38 + Math.random() * 6;
+  const size = isPolluted ? 42 : 38;
+  const laneLeft = getLaneLeft();
+  const laneWidth = getLaneWidth();
+  const minX = laneLeft + 10;
+  const maxX = laneLeft + laneWidth - size - 10;
+  const startX = Math.random() * (maxX - minX) + minX;
 
   drop.style.left = `${startX}px`;
   drop.style.top = "76px";
@@ -189,9 +217,7 @@ function createDrop() {
     polluted: isPolluted,
     x: startX,
     y: 76,
-    speed: speed,
-    drift: drift,
-    wobble: wobble
+    speed: getDropSpeed()
   };
 
   if (isPolluted) {
@@ -202,11 +228,10 @@ function createDrop() {
 }
 
 function clickPollutedDrop(id) {
-  const index = drops.findIndex(drop => drop.id === id);
+  const index = drops.findIndex((drop) => drop.id === id);
   if (index === -1) return;
 
   const drop = drops[index];
-
   if (!drop.polluted) return;
 
   drop.element.remove();
@@ -220,16 +245,23 @@ function clickPollutedDrop(id) {
 function animateDrops() {
   if (!running || gameOver || levelTransition) return;
 
-  const reservoirTop = gameArea.clientHeight - 130 - 18;
+  const reservoirTop = gameArea.clientHeight - getReservoirHeight() - 18;
+  const laneLeft = getLaneLeft();
+  const laneWidth = getLaneWidth();
 
   for (let i = drops.length - 1; i >= 0; i--) {
     const drop = drops[i];
+    const dropWidth = drop.element.offsetWidth || 42;
 
     drop.y += drop.speed;
-    drop.x += Math.sin(drop.y / 28) * drop.wobble + drop.drift;
 
-    if (drop.x < 10) drop.x = 10;
-    if (drop.x > gameArea.clientWidth - 50) drop.x = gameArea.clientWidth - 50;
+    if (drop.x < laneLeft + 6) {
+      drop.x = laneLeft + 6;
+    }
+
+    if (drop.x > laneLeft + laneWidth - dropWidth - 6) {
+      drop.x = laneLeft + laneWidth - dropWidth - 6;
+    }
 
     drop.element.style.top = `${drop.y}px`;
     drop.element.style.left = `${drop.x}px`;
@@ -251,10 +283,11 @@ function handleDropReachedReservoir(drop, index) {
     lives -= 1;
 
     if (lives < 0) lives = 0;
+
     updateDisplays();
     showMessage("Let's do better on our clean up.", "warning");
 
-    if (dirtyInTank >= 3 || lives <= 0) {
+    if (dirtyInTank >= MAX_DIRTY_IN_TANK || lives <= 0) {
       endGame();
     }
   } else {
@@ -285,10 +318,11 @@ function completeLevel() {
       level += 1;
       reservoirCurrent = 0;
       dirtyInTank = 0;
-      drops.forEach(drop => drop.element.remove());
-      drops = [];
-      updateDisplays();
 
+      drops.forEach((drop) => drop.element.remove());
+      drops = [];
+
+      updateDisplays();
       hideCelebration();
 
       levelTransition = false;
@@ -301,9 +335,11 @@ function completeLevel() {
 
 function drainReservoir(callback) {
   let percent = 100;
+
   const drainInterval = setInterval(() => {
     percent -= 5;
     if (percent < 0) percent = 0;
+
     reservoirFill.style.height = `${percent}%`;
 
     if (percent === 0) {
@@ -349,5 +385,23 @@ startBtn.addEventListener("click", startGame);
 pauseBtn.addEventListener("click", pauseGame);
 resetBtn.addEventListener("click", resetGame);
 playAgainBtn.addEventListener("click", resetGame);
+
+window.addEventListener("resize", () => {
+  for (const drop of drops) {
+    const dropWidth = drop.element.offsetWidth || 42;
+    const laneLeft = getLaneLeft();
+    const laneWidth = getLaneWidth();
+
+    if (drop.x < laneLeft + 6) {
+      drop.x = laneLeft + 6;
+    }
+
+    if (drop.x > laneLeft + laneWidth - dropWidth - 6) {
+      drop.x = laneLeft + laneWidth - dropWidth - 6;
+    }
+
+    drop.element.style.left = `${drop.x}px`;
+  }
+});
 
 updateDisplays();
