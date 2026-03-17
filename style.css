@@ -350,63 +350,111 @@ body {
 .leaf-4 { left: 104px; bottom: 84px; transform: rotate(48deg); }
 .leaf-5 { left: 40px; bottom: 76px; transform: rotate(-58deg); }
 
+/* Better dolphins */
 .dolphin {
   position: absolute;
-  width: 72px;
-  height: 20px;
-  background: #9fd4ee;
-  border-radius: 40px;
-  box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+  width: 96px;
+  height: 42px;
   animation-name: swimRight;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
 
-.dolphin::before {
-  content: "";
+.dolphin-body {
   position: absolute;
-  left: 26px;
-  top: -6px;
-  width: 14px;
-  height: 10px;
-  background: #9fd4ee;
-  transform: rotate(-25deg);
-  clip-path: polygon(0 100%, 50% 0, 100% 100%);
+  left: 0;
+  top: 8px;
+  width: 74px;
+  height: 24px;
+  background: linear-gradient(to bottom, #8fc8e7 0%, #9fd4ee 45%, #c9edf9 100%);
+  border-radius: 50px 42px 40px 50px;
+  transform: rotate(-10deg);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.14);
 }
 
-.dolphin::after {
+.dolphin-body::before {
   content: "";
   position: absolute;
-  right: -10px;
+  left: -10px;
   top: 5px;
-  border-left: 12px solid #9fd4ee;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
+  width: 24px;
+  height: 12px;
+  background: linear-gradient(to bottom, #8fc8e7 0%, #bfe8f6 100%);
+  border-radius: 50% 40% 40% 50%;
+  transform: rotate(-6deg);
+}
+
+.dolphin-belly {
+  position: absolute;
+  left: 12px;
+  top: 20px;
+  width: 44px;
+  height: 10px;
+  background: rgba(235, 250, 255, 0.95);
+  border-radius: 50px;
+  transform: rotate(-10deg);
+}
+
+.dolphin-fin {
+  position: absolute;
+  left: 34px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  background: #8fc8e7;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform: rotate(-20deg);
+}
+
+.dolphin-tail {
+  position: absolute;
+  right: 4px;
+  top: 8px;
+  width: 22px;
+  height: 12px;
+  background: #8fc8e7;
+  clip-path: polygon(0 50%, 100% 0, 85% 100%);
+  transform: rotate(-12deg);
+}
+
+.tail-bottom {
+  top: 20px;
+  transform: rotate(18deg);
+}
+
+.dolphin-eye {
+  position: absolute;
+  left: 12px;
+  top: 15px;
+  width: 4px;
+  height: 4px;
+  background: #111;
+  border-radius: 50%;
 }
 
 .dolphin-1 {
-  left: -100px;
+  left: -140px;
   top: 67%;
   animation-duration: 18s;
   animation-delay: 0s;
 }
 
 .dolphin-2 {
-  left: -160px;
+  left: -180px;
   top: 74%;
   animation-duration: 22s;
   animation-delay: 3s;
 }
 
 .dolphin-3 {
-  left: -130px;
+  left: -160px;
   top: 71%;
   animation-duration: 20s;
   animation-delay: 7s;
 }
 
 .dolphin-4 {
-  left: -200px;
+  left: -220px;
   top: 78%;
   animation-duration: 24s;
   animation-delay: 1s;
@@ -414,10 +462,19 @@ body {
 
 @keyframes swimRight {
   0% {
-    transform: translateX(0);
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(calc(25vw + 20px)) translateY(-6px);
+  }
+  50% {
+    transform: translateX(calc(50vw + 40px)) translateY(0);
+  }
+  75% {
+    transform: translateX(calc(75vw + 60px)) translateY(-8px);
   }
   100% {
-    transform: translateX(calc(100vw + 320px));
+    transform: translateX(calc(100vw + 360px)) translateY(0);
   }
 }
 
@@ -750,12 +807,33 @@ body {
   .wave-4 { top: 70%; }
   .wave-5 { top: 74%; }
 
-  .dolphin-1,
-  .dolphin-2,
-  .dolphin-3,
-  .dolphin-4 {
+  .dolphin {
+    width: 72px;
+    height: 32px;
+  }
+
+  .dolphin-body {
     width: 56px;
-    height: 16px;
+    height: 18px;
+  }
+
+  .dolphin-belly {
+    width: 34px;
+    height: 7px;
+    top: 16px;
+  }
+
+  .dolphin-fin {
+    left: 24px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .dolphin-tail {
+    width: 16px;
+    height: 10px;
+    right: 2px;
   }
 
   .center-system {
