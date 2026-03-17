@@ -87,7 +87,7 @@ function getLaneWidth() {
 }
 
 function getDropStartY() {
-  return window.innerWidth <= 560 ? 205 : 170;
+  return window.innerWidth <= 560 ? 230 : 170;
 }
 
 function ensureAudioContext() {
@@ -172,6 +172,7 @@ function showMessage(text, type = "") {
 function startGame() {
   ensureAudioContext();
   if (gameOver || levelTransition || running) return;
+
   running = true;
   showMessage("Game started. Catch the polluted drops before they enter the reservoir.");
   beginSpawning();
@@ -180,6 +181,7 @@ function startGame() {
 
 function pauseGame() {
   if (gameOver) return;
+
   running = false;
   clearInterval(spawnIntervalId);
   cancelAnimationFrame(animationFrameId);
@@ -443,17 +445,25 @@ function makeConfetti() {
 }
 
 function attachButton(btn, handler) {
-  if (btn) {
-    btn.addEventListener("click", (event) => {
+  if (!btn) return;
+
+  btn.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    ensureAudioContext();
+    handler();
+  });
+
+  btn.addEventListener(
+    "touchend",
+    function (event) {
       event.preventDefault();
+      event.stopPropagation();
       ensureAudioContext();
       handler();
-    });
-
-    btn.addEventListener("touchstart", () => {
-      ensureAudioContext();
-    }, { passive: true });
-  }
+    },
+    { passive: false }
+  );
 }
 
 attachButton(startBtn, startGame);
