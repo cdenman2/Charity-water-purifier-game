@@ -18,6 +18,9 @@ const finalScore = document.getElementById("finalScore");
 const startBtn = document.getElementById("startBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
+const desktopStartBtn = document.getElementById("desktopStartBtn");
+const desktopPauseBtn = document.getElementById("desktopPauseBtn");
+const desktopResetBtn = document.getElementById("desktopResetBtn");
 const playAgainBtn = document.getElementById("playAgainBtn");
 
 const gameArea = document.getElementById("gameArea");
@@ -80,6 +83,10 @@ function getLaneLeft() {
 
 function getLaneWidth() {
   return gameArea.clientWidth * getLaneWidthPercent();
+}
+
+function getDropStartY() {
+  return window.innerWidth <= 560 ? 165 : 170;
 }
 
 function updateDisplays() {
@@ -210,7 +217,7 @@ function createDrop() {
   const startX = Math.random() * (maxX - minX) + minX;
 
   drop.style.left = `${startX}px`;
-  drop.style.top = "76px";
+  drop.style.top = `${getDropStartY()}px`;
   drop.style.width = `${size}px`;
   drop.style.height = `${size * 1.25}px`;
 
@@ -221,7 +228,7 @@ function createDrop() {
     element: drop,
     polluted: isPolluted,
     x: startX,
-    y: 76,
+    y: getDropStartY(),
     speed: getDropSpeed()
   };
 
@@ -346,7 +353,6 @@ function drainReservoir(callback) {
 
 function fillDrinkableWaterTanks(callback) {
   drinkTankProgress += 1;
-
   updateDisplays();
 
   if (drinkTankProgress >= 8) {
@@ -394,10 +400,17 @@ function makeConfetti() {
   }
 }
 
-startBtn.addEventListener("click", startGame);
-pauseBtn.addEventListener("click", pauseGame);
-resetBtn.addEventListener("click", resetGame);
-playAgainBtn.addEventListener("click", resetGame);
+function attachButton(btn, handler) {
+  if (btn) btn.addEventListener("click", handler);
+}
+
+attachButton(startBtn, startGame);
+attachButton(pauseBtn, pauseGame);
+attachButton(resetBtn, resetGame);
+attachButton(desktopStartBtn, startGame);
+attachButton(desktopPauseBtn, pauseGame);
+attachButton(desktopResetBtn, resetGame);
+attachButton(playAgainBtn, resetGame);
 
 window.addEventListener("resize", () => {
   for (const drop of drops) {
