@@ -189,10 +189,10 @@ body {
 .game-area {
   position: relative;
   width: 100%;
-  height: 1120px;
+  height: 980px;
   overflow: hidden;
   border-top: 3px solid rgba(255,255,255,0.55);
-  background: linear-gradient(to bottom, #ffdce7 0%, #f5bfd9 22%, #d3d8eb 46%, #88c0ea 60%, #3f97dc 100%);
+  background: linear-gradient(to bottom, #ffdce7 0%, #f5bfd9 22%, #d3d8eb 44%, #88c0ea 56%, #3f97dc 100%);
 }
 
 .message-box {
@@ -430,9 +430,9 @@ body {
 }
 
 .side-water {
-  width: 16%;
-  max-width: 210px;
-  min-width: 120px;
+  width: 18%;
+  max-width: 240px;
+  min-width: 150px;
   height: 112px;
   background: rgba(44,143,230,0.96);
   border: 3px solid #1b5f9c;
@@ -607,19 +607,30 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .instruction-panel {
+    margin-bottom: 8px;
+  }
+
+  .game-area {
+    height: 760px;
+  }
+
   .message-box {
     width: calc(100% - 24px);
     left: 12px;
     transform: none;
+    top: 10px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
   }
 
   .mobile-controls {
     display: flex;
     position: absolute;
-    top: 96px;
+    top: 70px;
     left: 50%;
     transform: translateX(-50%);
-    width: 66%;
+    width: 80%;
     gap: 6px;
     z-index: 35;
   }
@@ -636,27 +647,50 @@ body {
   }
 
   .pipe-wrap {
-    width: 66%;
+    width: 72%;
     min-width: 0;
-    top: 120px;
+    top: 115px;
   }
+
+  .sun {
+    top: 140px;
+    width: 90px;
+    height: 90px;
+  }
+
+  .ocean-band {
+    top: 58%;
+  }
+
+  .wave-1 { top: 58%; }
+  .wave-2 { top: 62%; }
+  .wave-3 { top: 66%; }
+  .wave-4 { top: 70%; }
+  .wave-5 { top: 74%; }
 
   .center-system {
     width: 66%;
     min-width: 0;
   }
 
-  .reservoir {
-    font-size: 1rem;
-  }
-
   .side-water {
     width: 17%;
     min-width: 0;
+    height: 96px;
   }
 
   .side-water-label {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+    padding: 6px;
+  }
+
+  .reservoir {
+    font-size: 1rem;
+    height: 96px;
+  }
+
+  .water-system {
+    bottom: 14px;
   }
 
   .bottom-info {
