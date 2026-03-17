@@ -23,11 +23,11 @@ const playAgainBtn = document.getElementById("playAgainBtn");
 
 const gameArea = document.getElementById("gameArea");
 
-const splashAudio = new Audio("splash.mp3");
 const backgroundAudio = new Audio("background.mp3");
 backgroundAudio.loop = true;
 backgroundAudio.preload = "auto";
-splashAudio.preload = "auto";
+
+let audioCtx = null;
 
 const MAX_DIRTY_IN_TANK = 4;
 const STARTING_LIVES = 4;
@@ -49,6 +49,63 @@ let animationFrameId = null;
 let messageTimeoutId = null;
 let drops = [];
 
+function ensureAudioContext() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume().catch(() => {});
+  }
+}
+
+function playSplashSound() {
+  ensureAudioContext();
+  if (!audioCtx) return;
+
+  const now = audioCtx.currentTime;
+
+  const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.35, audioCtx.sampleRate);
+  const data = noiseBuffer.getChannelData(0);
+
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+  }
+
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = noiseBuffer;
+
+  const bandpass = audioCtx.createBiquadFilter();
+  bandpass.type = "bandpass";
+  bandpass.frequency.setValueAtTime(900, now);
+  bandpass.Q.setValueAtTime(0.8, now);
+
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.001, now);
+  gain.gain.exponentialRampToValueAtTime(1.4, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+  noise.connect(bandpass);
+  bandpass.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  noise.start(now);
+  noise.stop(now + 0.3);
+}
+
+function tryPlayBackground() {
+  backgroundAudio.volume = 0.6;
+  backgroundAudio.play().catch(() => {});
+}
+
+function stopBackground() {
+  backgroundAudio.pause();
+  backgroundAudio.currentTime = 0;
+}
+
 function getLevelGoal() {
   return 12 + (level - 1) * 4;
 }
@@ -67,23 +124,6 @@ function getDropStartY() {
 
 function getReservoirCollisionY() {
   return window.innerWidth <= 640 ? gameArea.clientHeight - 250 : gameArea.clientHeight - 360;
-}
-
-function tryPlayBackground() {
-  backgroundAudio.volume = 0.6;
-  backgroundAudio.play().catch(() => {});
-}
-
-function stopBackground() {
-  backgroundAudio.pause();
-  backgroundAudio.currentTime = 0;
-}
-
-function playSplash() {
-  splashAudio.pause();
-  splashAudio.currentTime = 0;
-  splashAudio.volume = 1.0;
-  splashAudio.play().catch(() => {});
 }
 
 function updateDisplays() {
@@ -157,7 +197,7 @@ function createDrop() {
   if (polluted) {
     drop.addEventListener("click", () => {
       if (!drops.includes(dropData)) return;
-      playSplash();
+      playSplashSound();
       drop.remove();
       drops = drops.filter(d => d !== dropData);
       score += DIRTY_CLICK_POINTS;
@@ -244,6 +284,7 @@ function completeLevel() {
 
 function startGame() {
   if (running || gameOver) return;
+  ensureAudioContext();
   running = true;
   tryPlayBackground();
   showMessage("Game started. Catch the polluted drops before they enter the reservoir.");
