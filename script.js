@@ -23,6 +23,12 @@ const playAgainBtn = document.getElementById("playAgainBtn");
 
 const gameArea = document.getElementById("gameArea");
 
+const splashAudio = new Audio("splash.mp3");
+const backgroundAudio = new Audio("background.mp3");
+backgroundAudio.loop = true;
+backgroundAudio.preload = "auto";
+splashAudio.preload = "auto";
+
 const MAX_DIRTY_IN_TANK = 4;
 const STARTING_LIVES = 4;
 const DIRTY_CLICK_POINTS = 100;
@@ -61,6 +67,23 @@ function getDropStartY() {
 
 function getReservoirCollisionY() {
   return window.innerWidth <= 640 ? gameArea.clientHeight - 250 : gameArea.clientHeight - 360;
+}
+
+function tryPlayBackground() {
+  backgroundAudio.volume = 0.6;
+  backgroundAudio.play().catch(() => {});
+}
+
+function stopBackground() {
+  backgroundAudio.pause();
+  backgroundAudio.currentTime = 0;
+}
+
+function playSplash() {
+  splashAudio.pause();
+  splashAudio.currentTime = 0;
+  splashAudio.volume = 1.0;
+  splashAudio.play().catch(() => {});
 }
 
 function updateDisplays() {
@@ -134,6 +157,7 @@ function createDrop() {
   if (polluted) {
     drop.addEventListener("click", () => {
       if (!drops.includes(dropData)) return;
+      playSplash();
       drop.remove();
       drops = drops.filter(d => d !== dropData);
       score += DIRTY_CLICK_POINTS;
@@ -221,6 +245,7 @@ function completeLevel() {
 function startGame() {
   if (running || gameOver) return;
   running = true;
+  tryPlayBackground();
   showMessage("Game started. Catch the polluted drops before they enter the reservoir.");
   spawnIntervalId = setInterval(createDrop, getSpawnRate());
   animateDrops();
@@ -230,6 +255,7 @@ function pauseGame() {
   running = false;
   clearInterval(spawnIntervalId);
   cancelAnimationFrame(animationFrameId);
+  backgroundAudio.pause();
   showMessage("Game paused.");
 }
 
@@ -250,6 +276,7 @@ function resetGame() {
   reservoirCurrent = 0;
   drinkTankProgress = 0;
 
+  stopBackground();
   gameOverPanel.classList.add("hidden");
   updateDisplays();
   showMessage("Game reset. Ready to protect clean water.");
@@ -260,6 +287,7 @@ function endGame() {
   gameOver = true;
   clearInterval(spawnIntervalId);
   cancelAnimationFrame(animationFrameId);
+  stopBackground();
 
   finalLives.textContent = lives;
   finalDirty.textContent = dirtyInTank;
