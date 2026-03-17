@@ -56,7 +56,11 @@ function getDropSpeed() {
 }
 
 function getDropStartY() {
-  return window.innerWidth <= 640 ? 190 : 200;
+  return window.innerWidth <= 640 ? 170 : 200;
+}
+
+function getReservoirCollisionY() {
+  return window.innerWidth <= 640 ? gameArea.clientHeight - 250 : gameArea.clientHeight - 360;
 }
 
 function updateDisplays() {
@@ -172,7 +176,7 @@ function handleDropReachedReservoir(dropData) {
 function animateDrops() {
   if (!running || gameOver) return;
 
-  const reservoirTop = gameArea.clientHeight - 360;
+  const reservoirTop = getReservoirCollisionY();
 
   for (let i = drops.length - 1; i >= 0; i--) {
     const drop = drops[i];
