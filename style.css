@@ -1,221 +1,591 @@
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:Arial;
+* {
+  box-sizing: border-box;
 }
 
-body{
-background:#101820;
-color:white;
+:root {
+  --brand-blue: #2fb6da;
+  --hud-blue: #1f8fff;
+  --ocean-blue: #1387eb;
+  --reservoir-blue: #218cf0;
+  --yellow: #ffd400;
+  --green: #37c95d;
+  --pink: #ff4d7f;
+  --purple: #b93fff;
+  --orange: #ff9628;
+  --dark: #101820;
 }
 
-.game-shell{
-width:100%;
-min-height:100vh;
-background:linear-gradient(#bfe9ff,#0d79d8);
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--dark);
+  color: #fff;
 }
 
-.top-bar{
-display:flex;
-justify-content:space-between;
-padding:20px;
-flex-wrap:wrap;
+body {
+  overflow-x: hidden;
 }
 
-.brand-header{
-display:flex;
-align-items:center;
-gap:12px;
+.game-shell {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #d6f1ff 0%, #9bd8ff 45%, #49a5ea 100%);
 }
 
-.charity-logo{
-height:50px;
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 18px 20px 10px;
+  flex-wrap: wrap;
 }
 
-.brand-title{
-font-size:2rem;
-font-weight:900;
-letter-spacing:1px;
+.brand-box {
+  flex: 1 1 600px;
+  max-width: 820px;
+  background: var(--brand-blue);
+  border: 6px solid #1592c9;
+  padding: 18px 22px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
-.brand-subtitle{
-font-weight:bold;
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
 
-.hud{
-display:flex;
-gap:10px;
+.charity-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  background: #fff;
+  border: 4px solid #1592c9;
+  padding: 6px;
+  flex-shrink: 0;
 }
 
-.hud-box{
-padding:10px;
-border:3px solid #1b8cff;
-text-align:center;
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.hud-value{
-font-size:1.5rem;
-font-weight:bold;
+.brand-title {
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: #06131c;
+  letter-spacing: 1px;
+  line-height: 1;
 }
 
-.glasses{
-display:flex;
-gap:5px;
+.brand-subtitle {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #06131c;
 }
 
-.glass{
-width:25px;
-height:35px;
-border:2px solid white;
-background:#73cbff;
+.hud {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(110px, 1fr));
+  gap: 10px;
+  flex: 0 1 420px;
+  width: 100%;
+  max-width: 420px;
 }
 
-#gameArea{
-position:relative;
-height:700px;
-overflow:hidden;
+.hud-box {
+  min-height: 90px;
+  border: 4px solid var(--hud-blue);
+  background: rgba(255, 255, 255, 0.15);
+  padding: 10px 8px;
+  text-align: center;
 }
 
-.pipe-wrap{
-position:absolute;
-top:80px;
-left:50%;
-transform:translateX(-50%);
-width:50%;
+.hud-label {
+  font-size: 0.95rem;
+  font-weight: 800;
 }
 
-.pipe-top{
-height:40px;
-background:#4f5964;
+.hud-value {
+  margin-top: 10px;
+  font-size: 2rem;
+  font-weight: 900;
 }
 
-.pipe-mouth{
-height:40px;
-background:#7d858d;
-border-radius:0 0 20px 20px;
+.glasses {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
 }
 
-.background-scene{
-position:absolute;
-inset:0;
+.glass {
+  width: 22px;
+  height: 34px;
+  border: 2px solid #fff;
+  border-radius: 4px 4px 8px 8px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.sun{
-position:absolute;
-top:80px;
-right:10%;
-width:120px;
-height:120px;
-border-radius:50%;
-background:yellow;
+.glass::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  height: 60%;
+  background: #73cbff;
+  border-radius: 0 0 5px 5px;
 }
 
-.island{
-position:absolute;
-bottom:200px;
-right:10%;
-width:150px;
-height:80px;
-background:#e9cf7a;
-border-radius:50%;
+.glass.empty {
+  opacity: 0.3;
 }
 
-.palm-trunk{
-width:6px;
-height:60px;
-background:brown;
-position:absolute;
-bottom:40px;
-left:70px;
+.glass.empty::after {
+  height: 12%;
+  background: #8c99a5;
 }
 
-.leaf{
-position:absolute;
-width:40px;
-height:15px;
-background:green;
+.instruction-panel {
+  width: min(760px, calc(100% - 24px));
+  margin: 0 auto 12px;
+  padding: 14px 18px;
+  background: var(--yellow);
+  color: #111;
+  border: 4px solid var(--hud-blue);
+  text-align: center;
+  font-weight: 900;
+  line-height: 1.3;
 }
 
-.wave{
-position:absolute;
-width:120%;
-height:40px;
-border-top:3px solid white;
+#gameArea {
+  position: relative;
+  width: 100%;
+  height: 840px;
+  overflow: hidden;
+  border-top: 4px solid rgba(255, 255, 255, 0.5);
+  background:
+    linear-gradient(to bottom,
+      #dff5ff 0%,
+      #b5e2ff 35%,
+      #6ab8ef 54%,
+      #4ca7e8 55%,
+      #2288da 100%);
 }
 
-.wave1{top:50%}
-.wave2{top:55%}
-.wave3{top:60%}
-
-.dolphin{
-position:absolute;
-width:60px;
-height:20px;
-background:#9ed0ea;
-border-radius:50px;
+.message-box {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(760px, calc(100% - 240px));
+  background: var(--yellow);
+  color: #111;
+  border: 4px solid var(--hud-blue);
+  padding: 12px 16px;
+  font-weight: 900;
+  text-align: center;
+  z-index: 30;
 }
 
-.dolphin1{right:15%;bottom:150px;}
-.dolphin2{right:25%;bottom:170px;}
-
-.drop{
-position:absolute;
-width:40px;
-height:50px;
+.message-box.success {
+  background: #7ae48d;
 }
 
-.drop-shape{
-width:100%;
-height:100%;
-clip-path:polygon(50% 0%,63% 18%,78% 38%,90% 60%,87% 78%,75% 92%,50% 100%,25% 92%,13% 78%,10% 60%,22% 38%,37% 18%);
-border:4px solid black;
+.message-box.warning {
+  background: #ff8d8d;
 }
 
-.clean-drop .drop-shape{
-background:#168bff;
+.mobile-controls {
+  display: none;
 }
 
-.polluted-drop .drop-shape{
-background:#37c95d;
+.left-controls {
+  position: absolute;
+  left: 16px;
+  top: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 28;
 }
 
-.side-water{
-position:absolute;
-bottom:0;
-width:15%;
-height:120px;
-background:#1c8fe3;
-display:flex;
-align-items:center;
-justify-content:center;
+.control-btn {
+  min-width: 110px;
+  padding: 12px 14px;
+  border: 3px solid #000;
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
 }
 
-.left-water{left:0;}
-.right-water{right:0;}
+.start-btn { background: #32d061; color: #051a0d; }
+.pause-btn { background: #ffd400; color: #111; }
+.reset-btn { background: #ff5563; color: #fff; }
 
-.reservoir{
-position:absolute;
-bottom:0;
-left:50%;
-transform:translateX(-50%);
-width:50%;
-height:120px;
-background:#168bff;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:1.5rem;
-font-weight:bold;
+.pipe-wrap {
+  position: absolute;
+  top: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  min-width: 320px;
+  z-index: 12;
 }
 
-.control-btn{
-padding:10px;
-margin:5px;
-font-weight:bold;
-cursor:pointer;
+.pipe-top {
+  height: 44px;
+  background: #4d5867;
 }
 
-.start-btn{background:#32d061}
-.pause-btn{background:#ffd400}
-.reset-btn{background:#ff4b5c}
+.pipe-mouth {
+  height: 38px;
+  background: #808b97;
+  border-radius: 0 0 22px 22px;
+}
+
+.background-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.sun {
+  position: absolute;
+  top: 150px;
+  right: 10%;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #fff200;
+}
+
+.wave {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border-top: 4px solid rgba(255, 255, 255, 0.8);
+}
+
+.wave1 { top: 53%; }
+.wave2 { top: 57%; }
+.wave3 { top: 61%; }
+
+.island {
+  position: absolute;
+  right: 10%;
+  top: 58%;
+  width: 140px;
+  height: 70px;
+  background: #e3cb74;
+  border-radius: 50%;
+}
+
+.palm-trunk {
+  position: absolute;
+  left: 64px;
+  bottom: 35px;
+  width: 6px;
+  height: 54px;
+  background: #8b3f2b;
+}
+
+.leaf {
+  position: absolute;
+  width: 38px;
+  height: 12px;
+  background: #119c19;
+  border-radius: 20px;
+}
+
+.leaf-1 { left: 38px; bottom: 78px; transform: rotate(-30deg); }
+.leaf-2 { left: 60px; bottom: 88px; transform: rotate(12deg); }
+.leaf-3 { left: 75px; bottom: 78px; transform: rotate(40deg); }
+.leaf-4 { left: 28px; bottom: 68px; transform: rotate(-55deg); }
+
+.dolphin {
+  position: absolute;
+  width: 62px;
+  height: 18px;
+  background: #a7d6ee;
+  border-radius: 40px;
+}
+
+.dolphin1 {
+  right: 22%;
+  top: 67%;
+}
+
+.dolphin2 {
+  right: 14%;
+  top: 70%;
+}
+
+#dropsContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+}
+
+.drop {
+  position: absolute;
+  width: 42px;
+  height: 54px;
+}
+
+.drop.clickable {
+  cursor: pointer;
+}
+
+.drop-shape {
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(50% 0%, 63% 18%, 78% 38%, 90% 60%, 87% 78%, 75% 92%, 50% 100%, 25% 92%, 13% 78%, 10% 60%, 22% 38%, 37% 18%);
+  border: 4px solid #000;
+}
+
+.clean-drop .drop-shape {
+  background: #168bff;
+}
+
+.polluted-drop .drop-shape {
+  background: #37c95d;
+}
+
+.side-water {
+  position: absolute;
+  bottom: 76px;
+  width: 15%;
+  height: 110px;
+  background: rgba(27, 138, 237, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 6;
+}
+
+.left-water { left: 0; }
+.right-water { right: 0; }
+
+.side-water-fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(to top, #0d78d5, #7ad1ff);
+  transition: height 0.8s ease;
+}
+
+.side-water-label {
+  position: relative;
+  z-index: 2;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px;
+}
+
+.reservoir-fill-frame {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 180px;
+  width: 50%;
+  min-width: 320px;
+  height: 80px;
+  border: 3px solid #333;
+  background: #d0d0d0;
+  overflow: hidden;
+  z-index: 8;
+}
+
+.reservoir-fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(to top, #107bd8, #6bc7ff);
+  transition: height 0.4s ease;
+}
+
+.reservoir-fill-text {
+  position: absolute;
+  top: 8px;
+  width: 100%;
+  text-align: center;
+  color: #222;
+  font-weight: 900;
+  z-index: 2;
+}
+
+.reservoir {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 76px;
+  width: 50%;
+  min-width: 320px;
+  height: 110px;
+  background: var(--reservoir-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-align: center;
+  z-index: 7;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.game-over-panel {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.game-over-card {
+  background: #fff;
+  color: #111;
+  padding: 24px;
+  border: 4px solid #ff5563;
+  width: min(420px, calc(100% - 30px));
+  text-align: center;
+}
+
+.play-again-btn {
+  margin-top: 10px;
+  padding: 12px 18px;
+  background: var(--yellow);
+  border: 3px solid #111;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.bottom-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 18px;
+  background: #102234;
+}
+
+.info-box {
+  border: 2px solid var(--hud-blue);
+  background: #162c40;
+  padding: 14px;
+  text-align: center;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .top-bar {
+    flex-direction: column;
+  }
+
+  .brand-box,
+  .hud {
+    max-width: 100%;
+  }
+
+  .hud {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  #gameArea {
+    height: 920px;
+  }
+}
+
+@media (max-width: 560px) {
+  .brand-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .charity-logo {
+    width: 90px;
+    height: 90px;
+  }
+
+  .brand-title {
+    font-size: 2.1rem;
+  }
+
+  .brand-subtitle {
+    font-size: 1rem;
+  }
+
+  .hud {
+    grid-template-columns: 1fr;
+  }
+
+  .message-box {
+    width: calc(100% - 24px);
+    left: 12px;
+    transform: none;
+  }
+
+  .mobile-controls {
+    display: flex;
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 66%;
+    gap: 6px;
+    z-index: 35;
+  }
+
+  .mobile-controls .control-btn {
+    min-width: 0;
+    flex: 1;
+    padding: 10px 6px;
+    font-size: 0.8rem;
+  }
+
+  .left-controls {
+    display: none;
+  }
+
+  .pipe-wrap,
+  .reservoir,
+  .reservoir-fill-frame {
+    width: 66%;
+    min-width: 0;
+  }
+
+  .pipe-wrap {
+    top: 150px;
+  }
+
+  .reservoir {
+    font-size: 1rem;
+  }
+
+  .side-water {
+    width: 17%;
+    font-size: 0.75rem;
+  }
+
+  .bottom-info {
+    grid-template-columns: 1fr;
+  }
+}
