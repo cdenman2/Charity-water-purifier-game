@@ -8,7 +8,6 @@
 </head>
 <body>
   <div class="game-shell">
-
     <header class="top-bar">
       <div class="brand-box">
         <div class="brand-title">charity: water</div>
@@ -101,8 +100,15 @@
 
       <div id="confettiContainer"></div>
 
-      <div class="side-water left-water">DRINKABLE WATER</div>
-      <div class="side-water right-water">DRINKABLE WATER</div>
+      <div class="side-water left-water">
+        <div id="leftDrinkFill" class="side-water-fill"></div>
+        <div class="side-water-label">DRINKABLE WATER</div>
+      </div>
+
+      <div class="side-water right-water">
+        <div id="rightDrinkFill" class="side-water-fill"></div>
+        <div class="side-water-label">DRINKABLE WATER</div>
+      </div>
 
       <div class="reservoir-fill-frame">
         <div id="reservoirFill" class="reservoir-fill"></div>
@@ -119,17 +125,17 @@
           <p>Too much pollution reached the reservoir.</p>
           <p><strong>Lives Left:</strong> <span id="finalLives">0</span></p>
           <p><strong>Dirty In Tank:</strong> <span id="finalDirty">0</span></p>
+          <p><strong>Final Score:</strong> <span id="finalScore">0</span></p>
           <button id="playAgainBtn" class="play-again-btn">PLAY AGAIN</button>
         </div>
       </div>
     </main>
 
     <footer class="bottom-info">
-      <div class="info-box">Green drops clicked = purifier score</div>
-      <div class="info-box">4 drinking glasses = 4 lives</div>
-      <div class="info-box">Reservoir fills, drains to ocean, then next level starts</div>
+      <div class="info-box">Each dirty drop clicked = +100 points</div>
+      <div class="info-box">Each dirty drop reaching reservoir = -200 points</div>
+      <div class="info-box">Each level fills side drink tanks by 1/8. Full tanks clear for +1000.</div>
     </footer>
-
   </div>
 
   <script src="script.js"></script>
