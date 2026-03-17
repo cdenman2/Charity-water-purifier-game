@@ -63,7 +63,6 @@ document.getElementById("messageBox").textContent="Let's do better on our clean 
 if(dirty>=4 || lives<=0){
 
 alert("GAME OVER")
-
 running=false
 
 }
@@ -107,7 +106,6 @@ fall()
 function startGame(){
 
 running=true
-
 setInterval(createDrop,1500)
 
 }
