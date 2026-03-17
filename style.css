@@ -358,29 +358,10 @@ body {
   border-radius: 60% 10% 60% 10%;
 }
 
-.leaf-1 {
-  left: 30px;
-  bottom: 72px;
-  transform: rotate(-30deg);
-}
-
-.leaf-2 {
-  left: 58px;
-  bottom: 84px;
-  transform: rotate(15deg);
-}
-
-.leaf-3 {
-  left: 86px;
-  bottom: 76px;
-  transform: rotate(45deg);
-}
-
-.leaf-4 {
-  left: 20px;
-  bottom: 60px;
-  transform: rotate(-55deg);
-}
+.leaf-1 { left: 30px; bottom: 72px; transform: rotate(-30deg); }
+.leaf-2 { left: 58px; bottom: 84px; transform: rotate(15deg); }
+.leaf-3 { left: 86px; bottom: 76px; transform: rotate(45deg); }
+.leaf-4 { left: 20px; bottom: 60px; transform: rotate(-55deg); }
 
 .ocean-horizon {
   position: absolute;
@@ -401,25 +382,9 @@ body {
   z-index: 2;
 }
 
-.wave-1 {
-  top: 50%;
-  height: 40px;
-  animation: waveMove 6s ease-in-out infinite;
-}
-
-.wave-2 {
-  top: 55%;
-  height: 34px;
-  opacity: 0.7;
-  animation: waveMove 8s ease-in-out infinite;
-}
-
-.wave-3 {
-  top: 60%;
-  height: 28px;
-  opacity: 0.5;
-  animation: waveMove 10s ease-in-out infinite;
-}
+.wave-1 { top: 50%; height: 40px; animation: waveMove 6s ease-in-out infinite; }
+.wave-2 { top: 55%; height: 34px; opacity: 0.7; animation: waveMove 8s ease-in-out infinite; }
+.wave-3 { top: 60%; height: 28px; opacity: 0.5; animation: waveMove 10s ease-in-out infinite; }
 
 #dropsContainer {
   position: absolute;
@@ -487,13 +452,8 @@ body {
   font-weight: 700;
 }
 
-.left-water {
-  left: 0;
-}
-
-.right-water {
-  right: 0;
-}
+.left-water { left: 0; }
+.right-water { right: 0; }
 
 .reservoir-fill-frame {
   position: absolute;
@@ -595,22 +555,9 @@ body {
   animation: dolphinSwim 7s ease-in-out infinite;
 }
 
-.dolphin-1 {
-  right: 18%;
-  bottom: 172px;
-}
-
-.dolphin-2 {
-  right: 12%;
-  bottom: 152px;
-  animation-duration: 8.5s;
-}
-
-.dolphin-3 {
-  right: 24%;
-  bottom: 140px;
-  animation-duration: 6.5s;
-}
+.dolphin-1 { right: 18%; bottom: 172px; }
+.dolphin-2 { right: 12%; bottom: 152px; animation-duration: 8.5s; }
+.dolphin-3 { right: 24%; bottom: 140px; animation-duration: 6.5s; }
 
 .dolphin-body {
   width: 70px;
