@@ -319,7 +319,7 @@ body {
 .island {
   position: absolute;
   right: 7%;
-  top: 68%;
+  top: 64%;
   width: 180px;
   height: 86px;
   background: #e2cb74;
@@ -350,7 +350,6 @@ body {
 .leaf-4 { left: 104px; bottom: 84px; transform: rotate(48deg); }
 .leaf-5 { left: 40px; bottom: 76px; transform: rotate(-58deg); }
 
-/* Better clownfish facing RIGHT */
 .clownfish {
   position: absolute;
   width: 94px;
@@ -447,28 +446,28 @@ body {
 
 .fish-1 {
   left: -140px;
-  top: 67%;
+  top: 75%;
   animation-duration: 18s;
   animation-delay: 0s;
 }
 
 .fish-2 {
   left: -200px;
-  top: 73%;
+  top: 79%;
   animation-duration: 22s;
   animation-delay: 3s;
 }
 
 .fish-3 {
   left: -180px;
-  top: 70%;
+  top: 83%;
   animation-duration: 20s;
   animation-delay: 6s;
 }
 
 .fish-4 {
   left: -240px;
-  top: 77%;
+  top: 87%;
   animation-duration: 24s;
   animation-delay: 1s;
 }
@@ -820,6 +819,10 @@ body {
   .wave-4 { top: 70%; }
   .wave-5 { top: 74%; }
 
+  .island {
+    top: 62%;
+  }
+
   .clownfish {
     width: 72px;
     height: 34px;
@@ -850,6 +853,11 @@ body {
   .stripe-2 {
     left: 36px;
   }
+
+  .fish-1 { top: 76%; }
+  .fish-2 { top: 80%; }
+  .fish-3 { top: 84%; }
+  .fish-4 { top: 88%; }
 
   .center-system {
     width: 66%;
