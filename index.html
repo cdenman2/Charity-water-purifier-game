@@ -29,22 +29,22 @@
       </div>
 
       <div class="hud">
-        <div class="hud-box">
+        <div class="hud-box hud-lives">
           <div class="hud-label">LIVES</div>
           <div id="livesDisplay" class="glasses"></div>
         </div>
 
-        <div class="hud-box">
+        <div class="hud-box hud-level">
           <div class="hud-label">LEVEL</div>
           <div id="levelDisplay" class="hud-value">1</div>
         </div>
 
-        <div class="hud-box">
+        <div class="hud-box hud-score">
           <div class="hud-label">SCORE</div>
           <div id="scoreDisplay" class="hud-value">0</div>
         </div>
 
-        <div class="hud-box hud-wide">
+        <div class="hud-box hud-dirty">
           <div class="hud-label">DIRTY IN TANK</div>
           <div id="dirtyTankDisplay" class="hud-value">0 / 4</div>
         </div>
@@ -80,10 +80,14 @@
       <div class="scene">
         <div class="sun"></div>
 
+        <div class="sky-band"></div>
         <div class="ocean-band"></div>
+
         <div class="wave wave-1"></div>
         <div class="wave wave-2"></div>
         <div class="wave wave-3"></div>
+        <div class="wave wave-4"></div>
+        <div class="wave wave-5"></div>
 
         <div class="island">
           <div class="palm-trunk"></div>
@@ -95,27 +99,33 @@
 
         <div class="dolphin dolphin-1"></div>
         <div class="dolphin dolphin-2"></div>
+        <div class="dolphin dolphin-3"></div>
+        <div class="dolphin dolphin-4"></div>
       </div>
 
       <div id="dropsContainer"></div>
 
-      <div class="side-water left-water">
-        <div id="leftDrinkFill" class="side-water-fill"></div>
-        <div class="side-water-label">DRINKABLE WATER</div>
-      </div>
+      <div class="water-system">
+        <div class="side-water left-water">
+          <div id="leftDrinkFill" class="side-water-fill"></div>
+          <div class="side-water-label">DRINKABLE WATER</div>
+        </div>
 
-      <div class="side-water right-water">
-        <div id="rightDrinkFill" class="side-water-fill"></div>
-        <div class="side-water-label">DRINKABLE WATER</div>
-      </div>
+        <div class="center-system">
+          <div class="reservoir-fill-frame">
+            <div id="reservoirFill" class="reservoir-fill"></div>
+            <div id="reservoirFillText" class="reservoir-fill-text">Reservoir Fill: 0 / 12</div>
+          </div>
 
-      <div class="reservoir-fill-frame">
-        <div id="reservoirFill" class="reservoir-fill"></div>
-        <div id="reservoirFillText" class="reservoir-fill-text">Reservoir Fill: 0 / 12</div>
-      </div>
+          <div id="reservoir" class="reservoir">
+            RESERVOIR OF CLEAN WATER
+          </div>
+        </div>
 
-      <div id="reservoir" class="reservoir">
-        RESERVOIR OF CLEAN WATER
+        <div class="side-water right-water">
+          <div id="rightDrinkFill" class="side-water-fill"></div>
+          <div class="side-water-label">DRINKABLE WATER</div>
+        </div>
       </div>
 
       <div id="gameOverPanel" class="game-over hidden">
