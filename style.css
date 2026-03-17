@@ -6,14 +6,13 @@
   --brand-blue: #2fb6da;
   --hud-border: #1e8fff;
   --yellow: #ffd400;
-  --green: #37c95d;
-  --red: #ff5b64;
   --reservoir-blue: #218cf0;
   --drink-blue: #2c8fe6;
-  --ocean-top: #3e9fe2;
+  --sunset-top: #ffdbe7;
+  --sunset-mid: #f7c3dd;
+  --sunset-bottom: #eab0d2;
+  --ocean-top: #5ea9e5;
   --ocean-bottom: #1f72c2;
-  --sky-top: #dff5ff;
-  --sky-bottom: #a6daf8;
 }
 
 html,
@@ -31,7 +30,7 @@ body {
 
 .page {
   min-height: 100vh;
-  background: linear-gradient(to bottom, var(--sky-top), #93d4fa, #4f9fe0);
+  background: linear-gradient(to bottom, var(--sunset-top), var(--sunset-mid), #8ac3ec 65%, #4f9fe0 100%);
 }
 
 .top-bar {
@@ -40,11 +39,12 @@ body {
   align-items: stretch;
   gap: 18px;
   padding: 16px 18px 10px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .brand-box {
-  flex: 1 1 700px;
+  flex: 0 1 760px;
+  max-width: 760px;
   background: var(--brand-blue);
   border: 5px solid #118cc5;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
@@ -89,12 +89,12 @@ body {
 }
 
 .hud {
-  flex: 0 1 430px;
+  flex: 0 0 560px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(86px, 1fr));
+  grid-template-columns: 1.2fr 1.2fr 1.2fr 1.8fr;
   gap: 10px;
-  width: 100%;
-  max-width: 430px;
+  width: 560px;
+  max-width: 560px;
 }
 
 .hud-box {
@@ -106,22 +106,22 @@ body {
 }
 
 .hud-lives {
-  background: rgba(255, 149, 43, 0.95);
+  background: rgba(255, 149, 43, 0.97);
   color: #111;
 }
 
 .hud-level {
-  background: rgba(255, 77, 127, 0.96);
+  background: rgba(255, 77, 127, 0.97);
   color: #fff;
 }
 
 .hud-score {
-  background: rgba(185, 66, 255, 0.96);
+  background: rgba(185, 66, 255, 0.97);
   color: #fff;
 }
 
-.hud-dirty {
-  background: rgba(55, 201, 93, 0.96);
+.hud-pollution {
+  background: rgba(55, 201, 93, 0.97);
   color: #111;
 }
 
@@ -190,10 +190,10 @@ body {
 .game-area {
   position: relative;
   width: 100%;
-  height: 980px;
+  height: 1080px;
   overflow: hidden;
   border-top: 3px solid rgba(255,255,255,0.55);
-  background: linear-gradient(to bottom, #dff5ff 0%, #b5e4ff 42%, #7bc2ed 58%, #409bdf 100%);
+  background: linear-gradient(to bottom, #ffe1eb 0%, #f7c4df 24%, #c9d9ef 48%, #6eb4e7 60%, #3892d8 100%);
 }
 
 .message-box {
@@ -222,7 +222,7 @@ body {
 .desktop-controls {
   position: absolute;
   left: 16px;
-  top: 180px;
+  top: 170px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -248,7 +248,7 @@ body {
 
 .pipe-wrap {
   position: absolute;
-  top: 210px;
+  top: 150px;
   left: 50%;
   transform: translateX(-50%);
   width: min(52%, 680px);
@@ -275,23 +275,23 @@ body {
 
 .sky-band {
   position: absolute;
-  inset: 0 0 50% 0;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0));
+  inset: 0 0 58% 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.18), rgba(255,255,255,0));
 }
 
 .ocean-band {
   position: absolute;
   left: 0;
   right: 0;
-  top: 58%;
+  top: 62%;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(62,159,226,0.75), rgba(31,114,194,0.98));
+  background: linear-gradient(to bottom, rgba(94,169,229,0.85), rgba(31,114,194,1));
 }
 
 .sun {
   position: absolute;
   right: 8%;
-  top: 240px;
+  top: 190px;
   width: 112px;
   height: 112px;
   border-radius: 50%;
@@ -302,19 +302,19 @@ body {
   position: absolute;
   left: 0;
   width: 100%;
-  border-top: 4px solid rgba(255,255,255,0.8);
+  border-top: 4px solid rgba(255,255,255,0.82);
 }
 
-.wave-1 { top: 58%; }
-.wave-2 { top: 61.5%; }
-.wave-3 { top: 65%; }
-.wave-4 { top: 68.5%; }
-.wave-5 { top: 72%; }
+.wave-1 { top: 62%; }
+.wave-2 { top: 65%; }
+.wave-3 { top: 68%; }
+.wave-4 { top: 71%; }
+.wave-5 { top: 74%; }
 
 .island {
   position: absolute;
   right: 8%;
-  top: 66%;
+  top: 70%;
   width: 150px;
   height: 72px;
   background: #e2cb74;
@@ -351,10 +351,10 @@ body {
   border-radius: 40px;
 }
 
-.dolphin-1 { left: 18%; top: 70%; }
-.dolphin-2 { left: 34%; top: 75%; }
-.dolphin-3 { right: 25%; top: 73%; }
-.dolphin-4 { right: 16%; top: 78%; }
+.dolphin-1 { left: 10%; top: 69%; }
+.dolphin-2 { left: 28%; top: 76%; }
+.dolphin-3 { right: 26%; top: 72%; }
+.dolphin-4 { right: 14%; top: 79%; }
 
 #dropsContainer {
   position: absolute;
@@ -391,7 +391,7 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 88px;
+  bottom: 52px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -537,22 +537,21 @@ body {
   font-weight: 700;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1180px) {
   .top-bar {
-    flex-direction: column;
+    flex-wrap: wrap;
   }
 
-  .brand-box,
-  .hud {
+  .brand-box {
+    flex: 1 1 100%;
     max-width: 100%;
   }
 
   .hud {
-    grid-template-columns: repeat(2, minmax(110px, 1fr));
-  }
-
-  .game-area {
-    height: 1040px;
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: repeat(4, minmax(110px, 1fr));
   }
 }
 
@@ -615,7 +614,7 @@ body {
   .pipe-wrap {
     width: 66%;
     min-width: 0;
-    top: 170px;
+    top: 150px;
   }
 
   .center-system {
