@@ -5,12 +5,15 @@ const dirtyTankDisplay = document.getElementById("dirtyTankDisplay");
 const livesDisplay = document.getElementById("livesDisplay");
 const reservoirFill = document.getElementById("reservoirFill");
 const reservoirFillText = document.getElementById("reservoirFillText");
+const leftDrinkFill = document.getElementById("leftDrinkFill");
+const rightDrinkFill = document.getElementById("rightDrinkFill");
 const messageBox = document.getElementById("messageBox");
 const celebrationBanner = document.getElementById("celebrationBanner");
 const confettiContainer = document.getElementById("confettiContainer");
 const gameOverPanel = document.getElementById("gameOverPanel");
 const finalLives = document.getElementById("finalLives");
 const finalDirty = document.getElementById("finalDirty");
+const finalScore = document.getElementById("finalScore");
 
 const startBtn = document.getElementById("startBtn");
 const pauseBtn = document.getElementById("pauseBtn");
@@ -21,12 +24,16 @@ const gameArea = document.getElementById("gameArea");
 
 const MAX_DIRTY_IN_TANK = 4;
 const STARTING_LIVES = 4;
+const DIRTY_CLICK_POINTS = 100;
+const DIRTY_HIT_PENALTY = 200;
+const TANK_FULL_BONUS = 1000;
 
 let score = 0;
 let level = 1;
 let lives = STARTING_LIVES;
 let dirtyInTank = 0;
 let reservoirCurrent = 0;
+let drinkTankProgress = 0;
 
 let running = false;
 let gameOver = false;
@@ -44,11 +51,11 @@ function getLevelGoal() {
 }
 
 function getSpawnRate() {
-  return Math.max(420, 1200 - (level - 1) * 90);
+  return Math.max(520, 1500 - (level - 1) * 110);
 }
 
 function getDropSpeed() {
-  return 1.1 + (level - 1) * 0.22;
+  return 0.75 + (level - 1) * 0.16;
 }
 
 function getPollutedChance() {
@@ -56,15 +63,9 @@ function getPollutedChance() {
 }
 
 function getLaneWidthPercent() {
-  if (window.innerWidth <= 560) {
-    return 0.66;
-  }
-  if (window.innerWidth <= 800) {
-    return 0.58;
-  }
-  if (window.innerWidth <= 1100) {
-    return 0.62;
-  }
+  if (window.innerWidth <= 560) return 0.66;
+  if (window.innerWidth <= 800) return 0.58;
+  if (window.innerWidth <= 1100) return 0.62;
   return 0.54;
 }
 
@@ -89,6 +90,10 @@ function updateDisplays() {
 
   const fillPercent = Math.min((reservoirCurrent / getLevelGoal()) * 100, 100);
   reservoirFill.style.height = `${fillPercent}%`;
+
+  const drinkPercent = Math.min((drinkTankProgress / 8) * 100, 100);
+  leftDrinkFill.style.height = `${drinkPercent}%`;
+  rightDrinkFill.style.height = `${drinkPercent}%`;
 
   renderLives();
 }
@@ -117,12 +122,11 @@ function showMessage(text, type = "") {
   messageTimeoutId = setTimeout(() => {
     messageBox.textContent = "Protect the reservoir and keep polluted water out.";
     messageBox.className = "message-box";
-  }, 1800);
+  }, 2000);
 }
 
 function startGame() {
   if (gameOver || levelTransition || running) return;
-
   running = true;
   showMessage("Game started. Catch the polluted drops before they enter the reservoir.");
   beginSpawning();
@@ -131,7 +135,6 @@ function startGame() {
 
 function pauseGame() {
   if (gameOver) return;
-
   running = false;
   clearInterval(spawnIntervalId);
   cancelAnimationFrame(animationFrameId);
@@ -153,6 +156,7 @@ function resetGame() {
   lives = STARTING_LIVES;
   dirtyInTank = 0;
   reservoirCurrent = 0;
+  drinkTankProgress = 0;
 
   dropsContainer.innerHTML = "";
   confettiContainer.innerHTML = "";
@@ -172,6 +176,7 @@ function endGame() {
 
   finalLives.textContent = lives;
   finalDirty.textContent = dirtyInTank;
+  finalScore.textContent = score;
   gameOverPanel.classList.remove("hidden");
 
   showMessage("Game over. Too much pollution reached the reservoir.", "warning");
@@ -237,7 +242,7 @@ function clickPollutedDrop(id) {
   drop.element.remove();
   drops.splice(index, 1);
 
-  score += 15;
+  score += DIRTY_CLICK_POINTS;
   updateDisplays();
   showMessage("Awesome Job, purifying water one drop at a time.", "success");
 }
@@ -246,23 +251,10 @@ function animateDrops() {
   if (!running || gameOver || levelTransition) return;
 
   const reservoirTop = gameArea.clientHeight - getReservoirHeight() - 18;
-  const laneLeft = getLaneLeft();
-  const laneWidth = getLaneWidth();
 
   for (let i = drops.length - 1; i >= 0; i--) {
     const drop = drops[i];
-    const dropWidth = drop.element.offsetWidth || 42;
-
     drop.y += drop.speed;
-
-    if (drop.x < laneLeft + 6) {
-      drop.x = laneLeft + 6;
-    }
-
-    if (drop.x > laneLeft + laneWidth - dropWidth - 6) {
-      drop.x = laneLeft + laneWidth - dropWidth - 6;
-    }
-
     drop.element.style.top = `${drop.y}px`;
     drop.element.style.left = `${drop.x}px`;
 
@@ -281,7 +273,9 @@ function handleDropReachedReservoir(drop, index) {
   if (drop.polluted) {
     dirtyInTank += 1;
     lives -= 1;
+    score -= DIRTY_HIT_PENALTY;
 
+    if (score < 0) score = 0;
     if (lives < 0) lives = 0;
 
     updateDisplays();
@@ -292,7 +286,6 @@ function handleDropReachedReservoir(drop, index) {
     }
   } else {
     reservoirCurrent += 1;
-    score += 5;
     updateDisplays();
 
     if (reservoirCurrent >= getLevelGoal()) {
@@ -311,26 +304,28 @@ function completeLevel() {
   cancelAnimationFrame(animationFrameId);
 
   showCelebration();
-  showMessage(`Reservoir full! Clean water is flowing to the ocean. Level ${level + 1} is starting.`, "success");
+  showMessage(`Reservoir full! Clean water is flowing to the drinkable tanks. Level ${level + 1} is starting.`, "success");
 
   setTimeout(() => {
     drainReservoir(() => {
-      level += 1;
-      reservoirCurrent = 0;
-      dirtyInTank = 0;
+      fillDrinkableWaterTanks(() => {
+        level += 1;
+        reservoirCurrent = 0;
+        dirtyInTank = 0;
 
-      drops.forEach((drop) => drop.element.remove());
-      drops = [];
+        drops.forEach((drop) => drop.element.remove());
+        drops = [];
 
-      updateDisplays();
-      hideCelebration();
+        updateDisplays();
+        hideCelebration();
 
-      levelTransition = false;
-      running = true;
-      beginSpawning();
-      animateDrops();
+        levelTransition = false;
+        running = true;
+        beginSpawning();
+        animateDrops();
+      });
     });
-  }, 1700);
+  }, 1400);
 }
 
 function drainReservoir(callback) {
@@ -347,6 +342,24 @@ function drainReservoir(callback) {
       callback();
     }
   }, 60);
+}
+
+function fillDrinkableWaterTanks(callback) {
+  drinkTankProgress += 1;
+
+  updateDisplays();
+
+  if (drinkTankProgress >= 8) {
+    setTimeout(() => {
+      score += TANK_FULL_BONUS;
+      drinkTankProgress = 0;
+      updateDisplays();
+      showMessage("Drinkable water tanks are full! Bonus +1000 points!", "success");
+      setTimeout(callback, 900);
+    }, 900);
+  } else {
+    setTimeout(callback, 900);
+  }
 }
 
 function showCelebration() {
@@ -388,18 +401,6 @@ playAgainBtn.addEventListener("click", resetGame);
 
 window.addEventListener("resize", () => {
   for (const drop of drops) {
-    const dropWidth = drop.element.offsetWidth || 42;
-    const laneLeft = getLaneLeft();
-    const laneWidth = getLaneWidth();
-
-    if (drop.x < laneLeft + 6) {
-      drop.x = laneLeft + 6;
-    }
-
-    if (drop.x > laneLeft + laneWidth - dropWidth - 6) {
-      drop.x = laneLeft + laneWidth - dropWidth - 6;
-    }
-
     drop.element.style.left = `${drop.x}px`;
   }
 });
