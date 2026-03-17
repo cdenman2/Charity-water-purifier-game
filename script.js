@@ -55,6 +55,10 @@ function getDropSpeed() {
   return 0.75 + (level - 1) * 0.16;
 }
 
+function getDropStartY() {
+  return window.innerWidth <= 640 ? 220 : 290;
+}
+
 function updateDisplays() {
   scoreDisplay.textContent = score;
   levelDisplay.textContent = level;
@@ -83,6 +87,7 @@ function renderLives() {
 function showMessage(text, type = "") {
   messageBox.textContent = text;
   messageBox.className = "message-box";
+
   if (type === "success") messageBox.classList.add("success");
   if (type === "warning") messageBox.classList.add("warning");
 
@@ -106,19 +111,19 @@ function createDrop() {
   drop.appendChild(shape);
 
   const gameWidth = gameArea.clientWidth;
-  const laneWidth = gameWidth * 0.5;
+  const laneWidth = Math.min(gameWidth * 0.52, 680);
   const laneLeft = (gameWidth - laneWidth) / 2;
   const startX = laneLeft + Math.random() * (laneWidth - 42);
 
   drop.style.left = `${startX}px`;
-  drop.style.top = "200px";
+  drop.style.top = `${getDropStartY()}px`;
   dropsContainer.appendChild(drop);
 
   const dropData = {
     element: drop,
     polluted,
     x: startX,
-    y: 200,
+    y: getDropStartY(),
     speed: getDropSpeed()
   };
 
@@ -167,7 +172,7 @@ function handleDropReachedReservoir(dropData) {
 function animateDrops() {
   if (!running || gameOver) return;
 
-  const reservoirTop = gameArea.clientHeight - 210;
+  const reservoirTop = gameArea.clientHeight - 280;
 
   for (let i = drops.length - 1; i >= 0; i--) {
     const drop = drops[i];
