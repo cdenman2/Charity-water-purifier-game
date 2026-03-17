@@ -41,7 +41,6 @@ let gameOver = false;
 let spawnIntervalId = null;
 let animationFrameId = null;
 let messageTimeoutId = null;
-
 let drops = [];
 
 function getLevelGoal() {
@@ -74,7 +73,6 @@ function updateDisplays() {
 
 function renderLives() {
   livesDisplay.innerHTML = "";
-
   for (let i = 0; i < STARTING_LIVES; i++) {
     const glass = document.createElement("div");
     glass.className = i < lives ? "glass" : "glass empty";
@@ -85,12 +83,8 @@ function renderLives() {
 function showMessage(text, type = "") {
   messageBox.textContent = text;
   messageBox.className = "message-box";
-
-  if (type === "success") {
-    messageBox.classList.add("success");
-  } else if (type === "warning") {
-    messageBox.classList.add("warning");
-  }
+  if (type === "success") messageBox.classList.add("success");
+  if (type === "warning") messageBox.classList.add("warning");
 
   clearTimeout(messageTimeoutId);
   messageTimeoutId = setTimeout(() => {
@@ -117,15 +111,14 @@ function createDrop() {
   const startX = laneLeft + Math.random() * (laneWidth - 42);
 
   drop.style.left = `${startX}px`;
-  drop.style.top = "190px";
-
+  drop.style.top = "200px";
   dropsContainer.appendChild(drop);
 
   const dropData = {
     element: drop,
-    polluted: polluted,
+    polluted,
     x: startX,
-    y: 190,
+    y: 200,
     speed: getDropSpeed()
   };
 
@@ -174,7 +167,7 @@ function handleDropReachedReservoir(dropData) {
 function animateDrops() {
   if (!running || gameOver) return;
 
-  const reservoirTop = gameArea.clientHeight - 190;
+  const reservoirTop = gameArea.clientHeight - 210;
 
   for (let i = drops.length - 1; i >= 0; i--) {
     const drop = drops[i];
@@ -207,7 +200,6 @@ function completeLevel() {
   reservoirCurrent = 0;
   dirtyInTank = 0;
   level += 1;
-
   updateDisplays();
 
   setTimeout(() => {
@@ -235,6 +227,7 @@ function pauseGame() {
 function resetGame() {
   running = false;
   gameOver = false;
+
   clearInterval(spawnIntervalId);
   cancelAnimationFrame(animationFrameId);
 
@@ -265,7 +258,7 @@ function endGame() {
   gameOverPanel.classList.remove("hidden");
 }
 
-function attachButton(button, handler) {
+function bindButton(button, handler) {
   if (!button) return;
   button.addEventListener("click", handler);
   button.addEventListener("touchend", (event) => {
@@ -274,12 +267,12 @@ function attachButton(button, handler) {
   }, { passive: false });
 }
 
-attachButton(startBtn, startGame);
-attachButton(pauseBtn, pauseGame);
-attachButton(resetBtn, resetGame);
-attachButton(desktopStartBtn, startGame);
-attachButton(desktopPauseBtn, pauseGame);
-attachButton(desktopResetBtn, resetGame);
-attachButton(playAgainBtn, resetGame);
+bindButton(startBtn, startGame);
+bindButton(pauseBtn, pauseGame);
+bindButton(resetBtn, resetGame);
+bindButton(desktopStartBtn, startGame);
+bindButton(desktopPauseBtn, pauseGame);
+bindButton(desktopResetBtn, resetGame);
+bindButton(playAgainBtn, resetGame);
 
 updateDisplays();
